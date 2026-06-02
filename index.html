@@ -26,12 +26,37 @@
       height: fit-content;
     }
 
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      margin-bottom: 4px;
+    }
+
     h1 {
       font-size: 1.4rem;
       font-weight: 700;
       color: #0f172a;
       text-align: center;
-      margin-bottom: 4px;
+    }
+
+    .sync-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      flex-shrink: 0;
+      background: #cbd5e1;
+      transition: background 0.3s;
+    }
+    .sync-dot.synced  { background: #22c55e; }
+    .sync-dot.saving  { background: #f59e0b; animation: pulse 1s infinite; }
+    .sync-dot.error   { background: #f43f5e; }
+    .sync-dot.local   { background: #94a3b8; }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50%       { opacity: 0.4; }
     }
 
     .subtitle {
@@ -118,7 +143,6 @@
       cursor: pointer;
       transition: border-color 0.15s;
     }
-
     .date-input:focus { border-color: #6366f1; }
 
     /* ── PERSON CARDS ──────────────────────────── */
@@ -159,10 +183,8 @@
       margin-bottom: 8px;
       transition: border-color 0.15s, background 0.15s, color 0.15s;
     }
-
     .meal-btn:last-child { margin-bottom: 0; }
     .meal-btn:hover { border-color: #6366f1; color: #6366f1; }
-
     .meal-btn.done {
       background: #eef2ff;
       border-color: #6366f1;
@@ -177,7 +199,6 @@
       color: #94a3b8;
       font-weight: 600;
     }
-
     .meal-btn.done .meal-tag {
       background: #c7d2fe;
       color: #4338ca;
@@ -206,7 +227,6 @@
       padding: 6px 0;
       border-bottom: 1px solid #f8fafc;
     }
-
     .history-row:last-child { border-bottom: none; }
 
     .h-date {
@@ -238,35 +258,29 @@
 </head>
 <body>
   <div class="app">
-    <h1>Dish Washing Tracker</h1>
-    <p class="subtitle">Balance: who owes whom dishes</p>
+    <div class="header">
+      <h1>Dish Washing Tracker</h1>
+      <div id="sync-dot" class="sync-dot" title=""></div>
+    </div>
+    <p class="subtitle" id="subtitle">Balance: who owes whom dishes</p>
 
     <!-- Scale -->
     <div class="scale-section">
       <svg width="300" height="110" viewBox="0 0 300 110">
-        <!-- Static post -->
         <line x1="150" y1="46" x2="150" y2="106"
           stroke="#94a3b8" stroke-width="4" stroke-linecap="round"/>
-        <!-- Static pivot knob -->
         <circle cx="150" cy="46" r="6" fill="#64748b"/>
-
-        <!-- Rotating group: beam + strings + plates -->
         <g id="scale-beam">
           <line x1="58" y1="46" x2="242" y2="46"
             stroke="#64748b" stroke-width="4" stroke-linecap="round"/>
-          <!-- Left (Oliver) -->
-          <line x1="58" y1="46" x2="58" y2="68"
-            stroke="#94a3b8" stroke-width="2"/>
+          <line x1="58" y1="46" x2="58" y2="68" stroke="#94a3b8" stroke-width="2"/>
           <ellipse cx="58" cy="68" rx="26" ry="5"
             fill="#e2e8f0" stroke="#cbd5e0" stroke-width="1.5"/>
-          <!-- Right (Claire) -->
-          <line x1="242" y1="46" x2="242" y2="68"
-            stroke="#94a3b8" stroke-width="2"/>
+          <line x1="242" y1="46" x2="242" y2="68" stroke="#94a3b8" stroke-width="2"/>
           <ellipse cx="242" cy="68" rx="26" ry="5"
             fill="#e2e8f0" stroke="#cbd5e0" stroke-width="1.5"/>
         </g>
       </svg>
-
       <div class="scale-labels">
         <div class="scale-label">
           <span class="scale-name">Oliver</span>
@@ -280,7 +294,7 @@
       <div id="balance-note" class="balance-note"></div>
     </div>
 
-    <!-- Date picker -->
+    <!-- Date -->
     <div class="date-row">
       <span class="date-label">Date</span>
       <input type="date" id="date-input" class="date-input" />
@@ -296,28 +310,26 @@
   </div>
 
   <script>
-    /* ─── Constants ──────────────────────────────── */
+    /* ═══════════════════════════════════════════════
+       CONFIG — paste your Firebase Realtime Database
+       URL here, e.g.:
+       "https://my-project-default-rtdb.firebaseio.com"
+    ═══════════════════════════════════════════════ */
+    const FIREBASE_URL = null;
+
+    /* ─── Constants ─────────────────────────── */
     const STORAGE_KEY = 'dishWashLog_v3';
     const MEALS = [
       { name: 'Dinner', weight: 2.0 },
       { name: 'Lunch',  weight: 1.5 },
     ];
 
-    /* ─── State ──────────────────────────────────── */
-    let log = loadLog();
+    /* ─── State ─────────────────────────────── */
+    let log = {};
     let selectedDate = getToday();
+    let sse = null;
 
-    /* ─── Storage ────────────────────────────────── */
-    function loadLog() {
-      try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || {}; }
-      catch { return {}; }
-    }
-
-    function saveLog() {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(log));
-    }
-
-    /* ─── Helpers ────────────────────────────────── */
+    /* ─── Helpers ───────────────────────────── */
     function getToday() {
       return new Date().toLocaleDateString('en-CA');
     }
@@ -337,7 +349,6 @@
       }, 0);
     }
 
-    // Positive = Oliver ahead (did more), Negative = Claire ahead
     function getBalance() {
       return totalKg('Oliver') - totalKg('Claire');
     }
@@ -346,44 +357,133 @@
       return (log[selectedDate] || {})[person] || [];
     }
 
-    /* ─── Mutations ──────────────────────────────── */
-    function toggleMeal(person, mealName) {
-      if (!log[selectedDate]) log[selectedDate] = {};
-      const day = log[selectedDate];
-      const meals = day[person] || [];
+    /* ─── Sync dot ──────────────────────────── */
+    function setSyncState(state, tip) {
+      const dot = document.getElementById('sync-dot');
+      dot.className = 'sync-dot ' + state;
+      dot.title = tip;
+    }
 
-      if (meals.includes(mealName)) {
-        const updated = meals.filter(m => m !== mealName);
-        if (updated.length === 0) delete day[person];
-        else day[person] = updated;
-      } else {
-        day[person] = [...meals, mealName];
+    /* ─── Firebase (REST + SSE) ─────────────── */
+    function firebaseUrl(path) {
+      return `${FIREBASE_URL}/${path}.json`;
+    }
+
+    async function loadFromFirebase() {
+      setSyncState('saving', 'Loading...');
+      try {
+        const res = await fetch(firebaseUrl('log'));
+        log = (await res.json()) || {};
+        setSyncState('synced', 'Live — data shared across devices');
+      } catch (e) {
+        setSyncState('error', 'Could not reach database');
       }
+    }
 
-      if (Object.keys(day).length === 0) delete log[selectedDate];
-      saveLog();
+    function listenForUpdates() {
+      if (sse) sse.close();
+      sse = new EventSource(firebaseUrl('log') + '?stream=1');
+      sse.addEventListener('put', e => {
+        const { path, data } = JSON.parse(e.data);
+        if (path === '/') {
+          log = data || {};
+        } else {
+          // Partial path update
+          const parts = path.slice(1).split('/');
+          let node = log;
+          for (let i = 0; i < parts.length - 1; i++) {
+            if (!node[parts[i]]) node[parts[i]] = {};
+            node = node[parts[i]];
+          }
+          if (data === null) delete node[parts[parts.length - 1]];
+          else node[parts[parts.length - 1]] = data;
+        }
+        setSyncState('synced', 'Live — data shared across devices');
+        render();
+      });
+      sse.addEventListener('patch', e => {
+        // Reload fully on patch to keep things simple
+        loadFromFirebase().then(render);
+      });
+      sse.onerror = () => {
+        setSyncState('error', 'Connection lost — retrying...');
+      };
+    }
+
+    // Write only the changed person's meals for a specific date
+    async function saveMealsToFirebase(date, person, meals) {
+      setSyncState('saving', 'Saving...');
+      try {
+        const path = `log/${date}/${person}`;
+        if (meals.length === 0) {
+          await fetch(firebaseUrl(path), { method: 'DELETE' });
+        } else {
+          await fetch(firebaseUrl(path), {
+            method: 'PUT',
+            body: JSON.stringify(meals),
+            headers: { 'Content-Type': 'application/json' },
+          });
+        }
+        // SSE will update local state; no need to re-render here
+      } catch (e) {
+        setSyncState('error', 'Failed to save');
+      }
+    }
+
+    /* ─── localStorage fallback ─────────────── */
+    function loadFromLocal() {
+      try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || {}; }
+      catch { return {}; }
+    }
+
+    function saveToLocal(date, person, meals) {
+      if (!log[date]) log[date] = {};
+      if (meals.length === 0) {
+        delete log[date][person];
+        if (Object.keys(log[date]).length === 0) delete log[date];
+      } else {
+        log[date][person] = meals;
+      }
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(log));
       render();
     }
 
-    /* ─── Render ──────────────────────────────────── */
+    /* ─── Toggle ────────────────────────────── */
+    function toggleMeal(person, mealName) {
+      const meals = getMeals(person);
+      const updated = meals.includes(mealName)
+        ? meals.filter(m => m !== mealName)
+        : [...meals, mealName];
+
+      if (FIREBASE_URL) {
+        // Optimistic update for snappy UI
+        if (!log[selectedDate]) log[selectedDate] = {};
+        if (updated.length === 0) delete log[selectedDate][person];
+        else log[selectedDate][person] = updated;
+        if (Object.keys(log[selectedDate]).length === 0) delete log[selectedDate];
+        render();
+        saveMealsToFirebase(selectedDate, person, updated);
+      } else {
+        saveToLocal(selectedDate, person, updated);
+      }
+    }
+
+    /* ─── Render ────────────────────────────── */
     function renderScale() {
       const balance = getBalance();
       const angle = Math.max(-24, Math.min(24, balance * 3.5));
-
       const beam = document.getElementById('scale-beam');
       beam.style.transformOrigin = '150px 46px';
       beam.style.transform = `rotate(${angle}deg)`;
 
       const fmt = v => (v > 0 ? '+' : '') + v.toFixed(1) + 'kg';
+      const oEl = document.getElementById('oliver-score');
+      const cEl = document.getElementById('claire-score');
 
-      const oScore = document.getElementById('oliver-score');
-      const cScore = document.getElementById('claire-score');
-
-      oScore.textContent = fmt(balance);
-      cScore.textContent = fmt(-balance);
-
-      oScore.className = 'scale-score ' + (balance > 0.01 ? 'ahead' : balance < -0.01 ? 'behind' : 'even');
-      cScore.className = 'scale-score ' + (-balance > 0.01 ? 'ahead' : -balance < -0.01 ? 'behind' : 'even');
+      oEl.textContent = fmt(balance);
+      cEl.textContent = fmt(-balance);
+      oEl.className = 'scale-score ' + (balance > 0.01 ? 'ahead' : balance < -0.01 ? 'behind' : 'even');
+      cEl.className = 'scale-score ' + (-balance > 0.01 ? 'ahead' : -balance < -0.01 ? 'behind' : 'even');
 
       const note = document.getElementById('balance-note');
       if (Math.abs(balance) < 0.01) {
@@ -407,8 +507,7 @@
             </button>`;
           }).join('');
           return `<div class="person-card">
-            <div class="person-card-name">${person}</div>
-            ${btns}
+            <div class="person-card-name">${person}</div>${btns}
           </div>`;
         }).join('');
     }
@@ -420,7 +519,6 @@
         .slice(0, 8);
 
       const el = document.getElementById('history');
-
       if (!dates.length) {
         el.innerHTML = '<div class="empty-history">No entries yet</div>';
         return;
@@ -447,16 +545,30 @@
       renderHistory();
     }
 
-    /* ─── Init ───────────────────────────────────── */
-    const dateInput = document.getElementById('date-input');
-    dateInput.value = selectedDate;
-    dateInput.max = getToday();
-    dateInput.addEventListener('change', e => {
-      selectedDate = e.target.value;
-      render();
-    });
+    /* ─── Init ──────────────────────────────── */
+    async function init() {
+      const dateInput = document.getElementById('date-input');
+      dateInput.value = selectedDate;
+      dateInput.max = getToday();
+      dateInput.addEventListener('change', e => {
+        selectedDate = e.target.value;
+        render();
+      });
 
-    render();
+      if (FIREBASE_URL) {
+        document.getElementById('subtitle').textContent = 'Live — shared across devices';
+        await loadFromFirebase();
+        listenForUpdates();
+      } else {
+        log = loadFromLocal();
+        setSyncState('local', 'Local only — data not shared between devices');
+        document.getElementById('subtitle').textContent = 'Local only — set up database to share';
+      }
+
+      render();
+    }
+
+    init();
   </script>
 </body>
 </html>
