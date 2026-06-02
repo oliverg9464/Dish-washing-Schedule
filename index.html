@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dish Washing Tracker</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: #f1f5f9;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      padding: 32px 16px;
+    }
+
+    .app {
+      background: #fff;
+      border-radius: 20px;
+      box-shadow: 0 4px 32px rgba(0,0,0,0.08);
+      padding: 32px 28px;
+      width: 100%;
+      max-width: 480px;
+      height: fit-content;
+    }
+
+    h1 {
+      font-size: 1.4rem;
+      font-weight: 700;
+      color: #0f172a;
+      text-align: center;
+      margin-bottom: 4px;
+    }
+
+    .subtitle {
+      text-align: center;
+      font-size: 0.78rem;
+      color: #94a3b8;
+      margin-bottom: 24px;
+    }
+
+    /* ── SCALE ─────────────────────────────────── */
+    .scale-section {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-bottom: 24px;
+    }
+
+    #scale-beam {
+      transition: transform 0.7s cubic-bezier(0.34, 1.4, 0.64, 1);
+    }
+
+    .scale-labels {
+      width: 300px;
+      display: flex;
+      justify-content: space-between;
+      padding: 0 8px;
+      margin-top: 8px;
+    }
+
+    .scale-label { text-align: center; }
+
+    .scale-name {
+      display: block;
+      font-size: 0.7rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      color: #64748b;
+      margin-bottom: 2px;
+    }
+
+    .scale-score {
+      font-size: 1.35rem;
+      font-weight: 800;
+      letter-spacing: -0.01em;
+    }
+
+    .scale-score.ahead  { color: #22c55e; }
+    .scale-score.behind { color: #f43f5e; }
+    .scale-score.even   { color: #94a3b8; }
+
+    .balance-note {
+      margin-top: 6px;
+      font-size: 0.75rem;
+      color: #94a3b8;
+      text-align: center;
+      min-height: 1.1em;
+    }
+
+    /* ── DATE ──────────────────────────────────── */
+    .date-row {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+
+    .date-label {
+      font-size: 0.74rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: #94a3b8;
+    }
+
+    .date-input {
+      border: 2px solid #e2e8f0;
+      border-radius: 8px;
+      padding: 6px 12px;
+      font-size: 0.92rem;
+      color: #334155;
+      outline: none;
+      cursor: pointer;
+      transition: border-color 0.15s;
+    }
+
+    .date-input:focus { border-color: #6366f1; }
+
+    /* ── PERSON CARDS ──────────────────────────── */
+    .people-row {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+
+    .person-card {
+      flex: 1;
+      border: 2px solid #e2e8f0;
+      border-radius: 14px;
+      padding: 16px 14px;
+    }
+
+    .person-card-name {
+      font-size: 1rem;
+      font-weight: 700;
+      color: #0f172a;
+      text-align: center;
+      margin-bottom: 12px;
+    }
+
+    .meal-btn {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 9px 12px;
+      border: 2px solid #e2e8f0;
+      border-radius: 10px;
+      background: #fff;
+      cursor: pointer;
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: #475569;
+      margin-bottom: 8px;
+      transition: border-color 0.15s, background 0.15s, color 0.15s;
+    }
+
+    .meal-btn:last-child { margin-bottom: 0; }
+    .meal-btn:hover { border-color: #6366f1; color: #6366f1; }
+
+    .meal-btn.done {
+      background: #eef2ff;
+      border-color: #6366f1;
+      color: #4338ca;
+    }
+
+    .meal-tag {
+      font-size: 0.7rem;
+      padding: 2px 7px;
+      border-radius: 20px;
+      background: #f1f5f9;
+      color: #94a3b8;
+      font-weight: 600;
+    }
+
+    .meal-btn.done .meal-tag {
+      background: #c7d2fe;
+      color: #4338ca;
+    }
+
+    /* ── HISTORY ───────────────────────────────── */
+    .divider {
+      height: 2px;
+      background: #f1f5f9;
+      margin-bottom: 16px;
+    }
+
+    .section-title {
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      color: #94a3b8;
+      margin-bottom: 10px;
+    }
+
+    .history-row {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      padding: 6px 0;
+      border-bottom: 1px solid #f8fafc;
+    }
+
+    .history-row:last-child { border-bottom: none; }
+
+    .h-date {
+      min-width: 52px;
+      font-size: 0.78rem;
+      font-weight: 600;
+      color: #94a3b8;
+      padding-top: 4px;
+    }
+
+    .h-chips { display: flex; flex-wrap: wrap; gap: 5px; }
+
+    .h-chip {
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 20px;
+      padding: 3px 10px;
+      font-size: 0.76rem;
+      color: #475569;
+    }
+
+    .empty-history {
+      text-align: center;
+      color: #cbd5e1;
+      font-size: 0.84rem;
+      padding: 8px 0;
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <h1>Dish Washing Tracker</h1>
+    <p class="subtitle">Balance: who owes whom dishes</p>
+
+    <!-- Scale -->
+    <div class="scale-section">
+      <svg width="300" height="110" viewBox="0 0 300 110">
+        <!-- Static post -->
+        <line x1="150" y1="46" x2="150" y2="106"
+          stroke="#94a3b8" stroke-width="4" stroke-linecap="round"/>
+        <!-- Static pivot knob -->
+        <circle cx="150" cy="46" r="6" fill="#64748b"/>
+
+        <!-- Rotating group: beam + strings + plates -->
+        <g id="scale-beam">
+          <line x1="58" y1="46" x2="242" y2="46"
+            stroke="#64748b" stroke-width="4" stroke-linecap="round"/>
+          <!-- Left (Oliver) -->
+          <line x1="58" y1="46" x2="58" y2="68"
+            stroke="#94a3b8" stroke-width="2"/>
+          <ellipse cx="58" cy="68" rx="26" ry="5"
+            fill="#e2e8f0" stroke="#cbd5e0" stroke-width="1.5"/>
+          <!-- Right (Claire) -->
+          <line x1="242" y1="46" x2="242" y2="68"
+            stroke="#94a3b8" stroke-width="2"/>
+          <ellipse cx="242" cy="68" rx="26" ry="5"
+            fill="#e2e8f0" stroke="#cbd5e0" stroke-width="1.5"/>
+        </g>
+      </svg>
+
+      <div class="scale-labels">
+        <div class="scale-label">
+          <span class="scale-name">Oliver</span>
+          <span id="oliver-score" class="scale-score even">0.0</span>
+        </div>
+        <div class="scale-label">
+          <span class="scale-name">Claire</span>
+          <span id="claire-score" class="scale-score even">0.0</span>
+        </div>
+      </div>
+      <div id="balance-note" class="balance-note"></div>
+    </div>
+
+    <!-- Date picker -->
+    <div class="date-row">
+      <span class="date-label">Date</span>
+      <input type="date" id="date-input" class="date-input" />
+    </div>
+
+    <!-- Person cards -->
+    <div class="people-row" id="people-row"></div>
+
+    <!-- History -->
+    <div class="divider"></div>
+    <div class="section-title">Recent Days</div>
+    <div id="history"></div>
+  </div>
+
+  <script>
+    /* ─── Constants ──────────────────────────────── */
+    const STORAGE_KEY = 'dishWashLog_v3';
+    const MEALS = [
+      { name: 'Dinner', weight: 2.0 },
+      { name: 'Lunch',  weight: 1.5 },
+    ];
+
+    /* ─── State ──────────────────────────────────── */
+    let log = loadLog();
+    let selectedDate = getToday();
+
+    /* ─── Storage ────────────────────────────────── */
+    function loadLog() {
+      try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || {}; }
+      catch { return {}; }
+    }
+
+    function saveLog() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(log));
+    }
+
+    /* ─── Helpers ────────────────────────────────── */
+    function getToday() {
+      return new Date().toLocaleDateString('en-CA');
+    }
+
+    function fmtDate(d) {
+      return new Date(d + 'T00:00:00')
+        .toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+    }
+
+    function mealWeight(name) {
+      return MEALS.find(m => m.name === name)?.weight ?? 0;
+    }
+
+    function totalKg(person) {
+      return Object.values(log).reduce((sum, day) => {
+        return sum + (day[person] || []).reduce((s, m) => s + mealWeight(m), 0);
+      }, 0);
+    }
+
+    // Positive = Oliver ahead (did more), Negative = Claire ahead
+    function getBalance() {
+      return totalKg('Oliver') - totalKg('Claire');
+    }
+
+    function getMeals(person) {
+      return (log[selectedDate] || {})[person] || [];
+    }
+
+    /* ─── Mutations ──────────────────────────────── */
+    function toggleMeal(person, mealName) {
+      if (!log[selectedDate]) log[selectedDate] = {};
+      const day = log[selectedDate];
+      const meals = day[person] || [];
+
+      if (meals.includes(mealName)) {
+        const updated = meals.filter(m => m !== mealName);
+        if (updated.length === 0) delete day[person];
+        else day[person] = updated;
+      } else {
+        day[person] = [...meals, mealName];
+      }
+
+      if (Object.keys(day).length === 0) delete log[selectedDate];
+      saveLog();
+      render();
+    }
+
+    /* ─── Render ──────────────────────────────────── */
+    function renderScale() {
+      const balance = getBalance();
+      const angle = Math.max(-24, Math.min(24, balance * 3.5));
+
+      const beam = document.getElementById('scale-beam');
+      beam.style.transformOrigin = '150px 46px';
+      beam.style.transform = `rotate(${angle}deg)`;
+
+      const fmt = v => (v > 0 ? '+' : '') + v.toFixed(1) + 'kg';
+
+      const oScore = document.getElementById('oliver-score');
+      const cScore = document.getElementById('claire-score');
+
+      oScore.textContent = fmt(balance);
+      cScore.textContent = fmt(-balance);
+
+      oScore.className = 'scale-score ' + (balance > 0.01 ? 'ahead' : balance < -0.01 ? 'behind' : 'even');
+      cScore.className = 'scale-score ' + (-balance > 0.01 ? 'ahead' : -balance < -0.01 ? 'behind' : 'even');
+
+      const note = document.getElementById('balance-note');
+      if (Math.abs(balance) < 0.01) {
+        note.textContent = 'All even!';
+      } else {
+        const leader = balance > 0 ? 'Oliver' : 'Claire';
+        note.textContent = `${leader} is ahead by ${Math.abs(balance).toFixed(1)}kg`;
+      }
+    }
+
+    function renderPeople() {
+      document.getElementById('people-row').innerHTML =
+        ['Oliver', 'Claire'].map(person => {
+          const personMeals = getMeals(person);
+          const btns = MEALS.map(meal => {
+            const done = personMeals.includes(meal.name);
+            return `<button class="meal-btn${done ? ' done' : ''}"
+              onclick="toggleMeal('${person}','${meal.name}')">
+              <span>${done ? meal.name + ' ✓' : meal.name}</span>
+              <span class="meal-tag">${meal.weight}kg</span>
+            </button>`;
+          }).join('');
+          return `<div class="person-card">
+            <div class="person-card-name">${person}</div>
+            ${btns}
+          </div>`;
+        }).join('');
+    }
+
+    function renderHistory() {
+      const dates = Object.keys(log)
+        .filter(d => Object.values(log[d]).some(m => m.length > 0))
+        .sort((a, b) => b.localeCompare(a))
+        .slice(0, 8);
+
+      const el = document.getElementById('history');
+
+      if (!dates.length) {
+        el.innerHTML = '<div class="empty-history">No entries yet</div>';
+        return;
+      }
+
+      el.innerHTML = dates.map(date => {
+        const day = log[date];
+        const chips = ['Oliver', 'Claire'].map(p => {
+          const meals = day[p] || [];
+          if (!meals.length) return '';
+          const kg = meals.reduce((s, m) => s + mealWeight(m), 0);
+          return `<span class="h-chip">${p}: ${meals.join(' + ')} (${kg}kg)</span>`;
+        }).join('');
+        return `<div class="history-row">
+          <span class="h-date">${fmtDate(date)}</span>
+          <div class="h-chips">${chips}</div>
+        </div>`;
+      }).join('');
+    }
+
+    function render() {
+      renderScale();
+      renderPeople();
+      renderHistory();
+    }
+
+    /* ─── Init ───────────────────────────────────── */
+    const dateInput = document.getElementById('date-input');
+    dateInput.value = selectedDate;
+    dateInput.max = getToday();
+    dateInput.addEventListener('change', e => {
+      selectedDate = e.target.value;
+      render();
+    });
+
+    render();
+  </script>
+</body>
+</html>
