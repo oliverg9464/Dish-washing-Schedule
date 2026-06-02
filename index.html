@@ -254,6 +254,43 @@
       font-size: 0.84rem;
       padding: 8px 0;
     }
+
+    /* ── ANIMATIONS ────────────────────────────── */
+
+    /* Score bounce when value changes */
+    @keyframes score-pop {
+      0%   { transform: scale(1); }
+      35%  { transform: scale(1.45); }
+      65%  { transform: scale(0.92); }
+      100% { transform: scale(1); }
+    }
+    .score-pop { animation: score-pop 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); }
+
+    /* Floating +/- label */
+    @keyframes float-up {
+      0%   { opacity: 1; transform: translateY(0)    scale(1); }
+      100% { opacity: 0; transform: translateY(-52px) scale(0.85); }
+    }
+
+    .float-label {
+      position: fixed;
+      font-size: 0.9rem;
+      font-weight: 800;
+      pointer-events: none;
+      z-index: 999;
+      animation: float-up 0.75s ease-out forwards;
+      transform-origin: center bottom;
+    }
+    .float-label.add    { color: #22c55e; }
+    .float-label.remove { color: #f43f5e; }
+
+    /* Plate glow flash on the SVG */
+    @keyframes plate-glow {
+      0%   { opacity: 1; }
+      40%  { opacity: 0.3; }
+      100% { opacity: 1; }
+    }
+    .plate-flash { animation: plate-glow 0.45s ease; }
   </style>
 </head>
 <body>
@@ -274,10 +311,10 @@
           <line x1="58" y1="46" x2="242" y2="46"
             stroke="#64748b" stroke-width="4" stroke-linecap="round"/>
           <line x1="58" y1="46" x2="58" y2="68" stroke="#94a3b8" stroke-width="2"/>
-          <ellipse cx="58" cy="68" rx="26" ry="5"
+          <ellipse id="plate-oliver" cx="58" cy="68" rx="26" ry="5"
             fill="#e2e8f0" stroke="#cbd5e0" stroke-width="1.5"/>
           <line x1="242" y1="46" x2="242" y2="68" stroke="#94a3b8" stroke-width="2"/>
-          <ellipse cx="242" cy="68" rx="26" ry="5"
+          <ellipse id="plate-claire" cx="242" cy="68" rx="26" ry="5"
             fill="#e2e8f0" stroke="#cbd5e0" stroke-width="1.5"/>
         </g>
       </svg>
@@ -448,12 +485,52 @@
       render();
     }
 
+    /* ─── Visual effects ────────────────────── */
+    function spawnFloatLabel(btn, text, adding) {
+      const rect = btn.getBoundingClientRect();
+      const el = document.createElement('div');
+      el.className = 'float-label ' + (adding ? 'add' : 'remove');
+      el.textContent = text;
+      el.style.left = (rect.left + rect.width / 2 - 20) + 'px';
+      el.style.top  = (rect.top + window.scrollY - 4) + 'px';
+      document.body.appendChild(el);
+      el.addEventListener('animationend', () => el.remove());
+    }
+
+    function popScore(person) {
+      const id = person === 'Oliver' ? 'oliver-score' : 'claire-score';
+      const el = document.getElementById(id);
+      el.classList.remove('score-pop');
+      void el.offsetWidth; // reflow to restart animation
+      el.classList.add('score-pop');
+      el.addEventListener('animationend', () => el.classList.remove('score-pop'), { once: true });
+    }
+
+    function flashPlate(person) {
+      const id = person === 'Oliver' ? 'plate-oliver' : 'plate-claire';
+      const el = document.getElementById(id);
+      el.classList.remove('plate-flash');
+      void el.offsetWidth;
+      el.classList.add('plate-flash');
+      el.addEventListener('animationend', () => el.classList.remove('plate-flash'), { once: true });
+    }
+
     /* ─── Toggle ────────────────────────────── */
-    function toggleMeal(person, mealName) {
+    function toggleMeal(person, mealName, btnEl) {
       const meals = getMeals(person);
-      const updated = meals.includes(mealName)
-        ? meals.filter(m => m !== mealName)
-        : [...meals, mealName];
+      const adding = !meals.includes(mealName);
+      const updated = adding
+        ? [...meals, mealName]
+        : meals.filter(m => m !== mealName);
+
+      const weight = mealWeight(mealName);
+      const label = (adding ? '+' : '-') + weight + 'kg';
+
+      // Find the button that was clicked for positioning the float label
+      const btn = btnEl || event?.target?.closest('.meal-btn');
+      if (btn) spawnFloatLabel(btn, label, adding);
+      popScore(person);
+      flashPlate(person);
 
       if (FIREBASE_URL) {
         // Optimistic update for snappy UI
@@ -501,7 +578,7 @@
           const btns = MEALS.map(meal => {
             const done = personMeals.includes(meal.name);
             return `<button class="meal-btn${done ? ' done' : ''}"
-              onclick="toggleMeal('${person}','${meal.name}')">
+              onclick="toggleMeal('${person}','${meal.name}',this)">
               <span>${done ? meal.name + ' ✓' : meal.name}</span>
               <span class="meal-tag">${meal.weight}kg</span>
             </button>`;
