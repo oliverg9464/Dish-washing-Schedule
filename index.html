@@ -16,67 +16,179 @@
       padding: 32px 16px;
     }
 
+    /* ── SETUP SCREEN ──────────────────────── */
+    #screen-setup {
+      width: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+    }
+
+    .setup-card {
+      background: #fff;
+      border-radius: 20px;
+      box-shadow: 0 4px 32px rgba(0,0,0,0.08);
+      padding: 40px 32px;
+      width: 100%;
+      max-width: 400px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .setup-card h1 {
+      text-align: center;
+      font-size: 1.4rem;
+      font-weight: 700;
+      color: #0f172a;
+      margin-bottom: 2px;
+    }
+
+    .setup-subtitle {
+      text-align: center;
+      color: #94a3b8;
+      font-size: 0.82rem;
+      margin-bottom: 10px;
+    }
+
+    .setup-label {
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      color: #64748b;
+      margin-top: 6px;
+    }
+
+    .setup-input {
+      border: 2px solid #e2e8f0;
+      border-radius: 10px;
+      padding: 10px 14px;
+      font-size: 0.95rem;
+      color: #0f172a;
+      outline: none;
+      transition: border-color 0.15s;
+      width: 100%;
+    }
+    .setup-input:focus { border-color: #6366f1; }
+
+    .member-row {
+      display: flex;
+      gap: 10px;
+    }
+    .member-row .setup-input { flex: 1; }
+
+    #setup-btn {
+      margin-top: 14px;
+      padding: 13px;
+      background: #6366f1;
+      color: #fff;
+      font-size: 1rem;
+      font-weight: 700;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+    #setup-btn:hover    { background: #4338ca; }
+    #setup-btn:disabled { background: #a5b4fc; cursor: not-allowed; }
+
+    #setup-error {
+      color: #f43f5e;
+      font-size: 0.8rem;
+      text-align: center;
+      min-height: 1em;
+    }
+
+    /* ── APP SCREEN ────────────────────────── */
+    #screen-app { width: 100%; display: none; justify-content: center; }
+
     .app {
       background: #fff;
       border-radius: 20px;
       box-shadow: 0 4px 32px rgba(0,0,0,0.08);
-      padding: 32px 28px;
+      padding: 28px 28px 32px;
       width: 100%;
       max-width: 480px;
       height: fit-content;
     }
 
+    /* ── HEADER ────────────────────────────── */
     .header {
       display: flex;
       align-items: center;
-      justify-content: center;
-      gap: 10px;
-      margin-bottom: 4px;
+      gap: 8px;
+      margin-bottom: 2px;
     }
 
-    h1 {
-      font-size: 1.4rem;
+    .header h1 {
+      font-size: 1.2rem;
       font-weight: 700;
       color: #0f172a;
-      text-align: center;
+      flex: 1;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
 
+    .share-btn {
+      font-size: 0.72rem;
+      font-weight: 700;
+      padding: 4px 11px;
+      border: 2px solid #e2e8f0;
+      border-radius: 20px;
+      background: #fff;
+      color: #64748b;
+      cursor: pointer;
+      white-space: nowrap;
+      flex-shrink: 0;
+      transition: border-color 0.15s, color 0.15s;
+    }
+    .share-btn:hover   { border-color: #6366f1; color: #6366f1; }
+    .share-btn.copied  { border-color: #22c55e; color: #22c55e; }
+
     .sync-dot {
-      width: 8px;
-      height: 8px;
+      width: 8px; height: 8px;
       border-radius: 50%;
       flex-shrink: 0;
       background: #cbd5e1;
       transition: background 0.3s;
     }
-    .sync-dot.synced  { background: #22c55e; }
-    .sync-dot.saving  { background: #f59e0b; animation: pulse 1s infinite; }
-    .sync-dot.error   { background: #f43f5e; }
-    .sync-dot.local   { background: #94a3b8; }
+    .sync-dot.synced { background: #22c55e; }
+    .sync-dot.saving { background: #f59e0b; animation: blink 1s infinite; }
+    .sync-dot.error  { background: #f43f5e; }
+    .sync-dot.local  { background: #94a3b8; }
 
-    @keyframes pulse {
-      0%, 100% { opacity: 1; }
-      50%       { opacity: 0.4; }
-    }
+    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:.4} }
 
     .subtitle {
-      text-align: center;
-      font-size: 0.78rem;
+      font-size: 0.76rem;
       color: #94a3b8;
-      margin-bottom: 24px;
+      margin-bottom: 20px;
     }
 
-    /* ── SCALE ─────────────────────────────────── */
+    /* ── FID ERROR ─────────────────────────── */
+    .fid-error {
+      background: #fff1f2;
+      border: 1px solid #fecdd3;
+      border-radius: 10px;
+      padding: 12px 16px;
+      color: #f43f5e;
+      font-size: 0.84rem;
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    .fid-error a { color: #6366f1; text-decoration: underline; }
+
+    /* ── SCALE ─────────────────────────────── */
     .scale-section {
       display: flex;
       flex-direction: column;
       align-items: center;
-      margin-bottom: 24px;
+      margin-bottom: 22px;
     }
 
-    #scale-beam {
-      transition: transform 0.7s cubic-bezier(0.34, 1.4, 0.64, 1);
-    }
+    #scale-beam { transition: transform 0.7s cubic-bezier(0.34, 1.4, 0.64, 1); }
 
     .scale-labels {
       width: 300px;
@@ -103,7 +215,6 @@
       font-weight: 800;
       letter-spacing: -0.01em;
     }
-
     .scale-score.ahead  { color: #22c55e; }
     .scale-score.behind { color: #f43f5e; }
     .scale-score.even   { color: #94a3b8; }
@@ -116,13 +227,13 @@
       min-height: 1.1em;
     }
 
-    /* ── DATE ──────────────────────────────────── */
+    /* ── DATE ──────────────────────────────── */
     .date-row {
       display: flex;
       align-items: center;
       justify-content: center;
       gap: 10px;
-      margin-bottom: 20px;
+      margin-bottom: 18px;
     }
 
     .date-label {
@@ -145,7 +256,7 @@
     }
     .date-input:focus { border-color: #6366f1; }
 
-    /* ── PERSON CARDS ──────────────────────────── */
+    /* ── PERSON CARDS ──────────────────────── */
     .people-row {
       display: flex;
       gap: 12px;
@@ -199,17 +310,10 @@
       color: #94a3b8;
       font-weight: 600;
     }
-    .meal-btn.done .meal-tag {
-      background: #c7d2fe;
-      color: #4338ca;
-    }
+    .meal-btn.done .meal-tag { background: #c7d2fe; color: #4338ca; }
 
-    /* ── HISTORY ───────────────────────────────── */
-    .divider {
-      height: 2px;
-      background: #f1f5f9;
-      margin-bottom: 16px;
-    }
+    /* ── HISTORY ───────────────────────────── */
+    .divider { height: 2px; background: #f1f5f9; margin-bottom: 16px; }
 
     .section-title {
       font-size: 0.72rem;
@@ -255,9 +359,7 @@
       padding: 8px 0;
     }
 
-    /* ── ANIMATIONS ────────────────────────────── */
-
-    /* Weight disc drop-in */
+    /* ── ANIMATIONS ────────────────────────── */
     @keyframes disc-drop {
       0%   { opacity: 0; transform: translateY(-14px) scaleY(0.5); }
       60%  { opacity: 1; transform: translateY(3px)   scaleY(1.05); }
@@ -265,7 +367,6 @@
     }
     .w-disc-new { animation: disc-drop 0.32s cubic-bezier(0.34, 1.4, 0.64, 1); }
 
-    /* Score bounce when value changes */
     @keyframes score-pop {
       0%   { transform: scale(1); }
       35%  { transform: scale(1.45); }
@@ -274,12 +375,10 @@
     }
     .score-pop { animation: score-pop 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); }
 
-    /* Floating +/- label */
     @keyframes float-up {
-      0%   { opacity: 1; transform: translateY(0)    scale(1); }
+      0%   { opacity: 1; transform: translateY(0) scale(1); }
       100% { opacity: 0; transform: translateY(-52px) scale(0.85); }
     }
-
     .float-label {
       position: fixed;
       font-size: 0.9rem;
@@ -287,98 +386,134 @@
       pointer-events: none;
       z-index: 999;
       animation: float-up 0.75s ease-out forwards;
-      transform-origin: center bottom;
     }
     .float-label.add    { color: #22c55e; }
     .float-label.remove { color: #f43f5e; }
 
-    /* Plate glow flash on the SVG */
     @keyframes plate-glow {
-      0%   { opacity: 1; }
-      40%  { opacity: 0.3; }
-      100% { opacity: 1; }
+      0%,100% { opacity: 1; }
+      40%     { opacity: 0.3; }
     }
     .plate-flash { animation: plate-glow 0.45s ease; }
   </style>
 </head>
 <body>
-  <div class="app">
-    <div class="header">
+
+  <!-- ══ SETUP SCREEN ══════════════════════════════ -->
+  <div id="screen-setup">
+    <div class="setup-card">
       <h1>Dish Washing Tracker</h1>
-      <div id="sync-dot" class="sync-dot" title=""></div>
-    </div>
-    <p class="subtitle" id="subtitle">Balance: who owes whom dishes</p>
+      <p class="setup-subtitle">Create a family to start tracking</p>
 
-    <!-- Scale -->
-    <div class="scale-section">
-      <svg width="300" height="110" viewBox="0 0 300 110">
-        <line x1="150" y1="46" x2="150" y2="106"
-          stroke="#94a3b8" stroke-width="4" stroke-linecap="round"/>
-        <circle cx="150" cy="46" r="6" fill="#64748b"/>
-        <g id="scale-beam">
-          <line x1="58" y1="46" x2="242" y2="46"
-            stroke="#64748b" stroke-width="4" stroke-linecap="round"/>
-          <line x1="58" y1="46" x2="58" y2="68" stroke="#94a3b8" stroke-width="2"/>
-          <ellipse id="plate-oliver" cx="58" cy="68" rx="26" ry="5"
-            fill="#e2e8f0" stroke="#cbd5e0" stroke-width="1.5"/>
-          <!-- weight discs stacked above Oliver's plate -->
-          <g id="weights-oliver"></g>
-          <line x1="242" y1="46" x2="242" y2="68" stroke="#94a3b8" stroke-width="2"/>
-          <ellipse id="plate-claire" cx="242" cy="68" rx="26" ry="5"
-            fill="#e2e8f0" stroke="#cbd5e0" stroke-width="1.5"/>
-          <!-- weight discs stacked above Claire's plate -->
-          <g id="weights-claire"></g>
-        </g>
-      </svg>
-      <div class="scale-labels">
-        <div class="scale-label">
-          <span class="scale-name">Oliver</span>
-          <span id="oliver-score" class="scale-score even">0.0</span>
-        </div>
-        <div class="scale-label">
-          <span class="scale-name">Claire</span>
-          <span id="claire-score" class="scale-score even">0.0</span>
-        </div>
+      <label class="setup-label">Family name</label>
+      <input type="text" id="setup-family-name" class="setup-input"
+             placeholder="e.g. Oliver &amp; Claire" maxlength="40" />
+
+      <label class="setup-label">Two members</label>
+      <div class="member-row">
+        <input type="text" id="setup-member-0" class="setup-input"
+               placeholder="Person 1" maxlength="20" />
+        <input type="text" id="setup-member-1" class="setup-input"
+               placeholder="Person 2" maxlength="20" />
       </div>
-      <div id="balance-note" class="balance-note"></div>
+
+      <button id="setup-btn">Create Family</button>
+      <div id="setup-error"></div>
     </div>
+  </div>
 
-    <!-- Date -->
-    <div class="date-row">
-      <span class="date-label">Date</span>
-      <input type="date" id="date-input" class="date-input" />
+  <!-- ══ APP SCREEN ════════════════════════════════ -->
+  <div id="screen-app">
+    <div class="app">
+
+      <!-- Error banner (shown if fid not found) -->
+      <div id="fid-error" class="fid-error" style="display:none">
+        Family not found. <a href="?">Create a new one.</a>
+      </div>
+
+      <!-- Header -->
+      <div class="header">
+        <h1 id="app-title">Dish Washing Tracker</h1>
+        <button id="share-btn" class="share-btn">Share</button>
+        <div id="sync-dot" class="sync-dot" title=""></div>
+      </div>
+      <p class="subtitle" id="subtitle">Live — shared across devices</p>
+
+      <!-- Scale -->
+      <div class="scale-section">
+        <svg width="300" height="110" viewBox="0 0 300 110">
+          <line x1="150" y1="46" x2="150" y2="106"
+            stroke="#94a3b8" stroke-width="4" stroke-linecap="round"/>
+          <circle cx="150" cy="46" r="6" fill="#64748b"/>
+          <g id="scale-beam">
+            <line x1="58" y1="46" x2="242" y2="46"
+              stroke="#64748b" stroke-width="4" stroke-linecap="round"/>
+            <line x1="58" y1="46" x2="58" y2="68" stroke="#94a3b8" stroke-width="2"/>
+            <ellipse id="plate-0" cx="58" cy="68" rx="26" ry="5"
+              fill="#e2e8f0" stroke="#cbd5e0" stroke-width="1.5"/>
+            <g id="weights-0"></g>
+            <line x1="242" y1="46" x2="242" y2="68" stroke="#94a3b8" stroke-width="2"/>
+            <ellipse id="plate-1" cx="242" cy="68" rx="26" ry="5"
+              fill="#e2e8f0" stroke="#cbd5e0" stroke-width="1.5"/>
+            <g id="weights-1"></g>
+          </g>
+        </svg>
+        <div class="scale-labels">
+          <div class="scale-label">
+            <span class="scale-name" id="scale-name-0">—</span>
+            <span id="score-0" class="scale-score even">0.0</span>
+          </div>
+          <div class="scale-label">
+            <span class="scale-name" id="scale-name-1">—</span>
+            <span id="score-1" class="scale-score even">0.0</span>
+          </div>
+        </div>
+        <div id="balance-note" class="balance-note"></div>
+      </div>
+
+      <!-- Date -->
+      <div class="date-row">
+        <span class="date-label">Date</span>
+        <input type="date" id="date-input" class="date-input" />
+      </div>
+
+      <!-- Person cards -->
+      <div class="people-row" id="people-row"></div>
+
+      <!-- History -->
+      <div class="divider"></div>
+      <div class="section-title">Recent Days</div>
+      <div id="history"></div>
     </div>
-
-    <!-- Person cards -->
-    <div class="people-row" id="people-row"></div>
-
-    <!-- History -->
-    <div class="divider"></div>
-    <div class="section-title">Recent Days</div>
-    <div id="history"></div>
   </div>
 
   <script>
-    /* ═══════════════════════════════════════════════
-       CONFIG — paste your Firebase Realtime Database
-       URL here, e.g.:
-       "https://my-project-default-rtdb.firebaseio.com"
-    ═══════════════════════════════════════════════ */
+    /* ═══════════════════════════════════════
+       CONFIG
+    ═══════════════════════════════════════ */
     const FIREBASE_URL = "https://oliver-and-claire-dinner-default-rtdb.firebaseio.com";
 
-    /* ─── Constants ─────────────────────────── */
-    const STORAGE_KEY = 'dishWashLog_v3';
+    /* ─── Constants ─────────────────────── */
     const MEALS = [
       { name: 'Dinner', weight: 2.0 },
       { name: 'Lunch',  weight: 1.5 },
     ];
+    const DISC_STYLE = {
+      Dinner: { fill: '#6366f1', stroke: '#4338ca', w: 44, label: '2kg' },
+      Lunch:  { fill: '#a78bfa', stroke: '#7c3aed', w: 36, label: '1.5kg' },
+    };
+    const PLATE_X = [58, 242];
 
-    /* ─── State ─────────────────────────────── */
-    let log = {};
+    /* ─── State ─────────────────────────── */
+    let familyId   = null;
+    let members    = ['', ''];
+    let familyName = '';
+    let log        = {};
     let selectedDate = getToday();
-    let sse = null;
+    let sse        = null;
+    let prevDiscs  = {};
 
-    /* ─── Helpers ───────────────────────────── */
+    /* ─── Helpers ───────────────────────── */
     function getToday() {
       return new Date().toLocaleDateString('en-CA');
     }
@@ -399,105 +534,95 @@
     }
 
     function getBalance() {
-      return totalKg('Oliver') - totalKg('Claire');
+      return totalKg(members[0]) - totalKg(members[1]);
     }
 
     function getMeals(person) {
       return (log[selectedDate] || {})[person] || [];
     }
 
-    /* ─── Sync dot ──────────────────────────── */
-    function setSyncState(state, tip) {
-      const dot = document.getElementById('sync-dot');
-      dot.className = 'sync-dot ' + state;
-      dot.title = tip;
+    function generateFid() {
+      return Array.from(crypto.getRandomValues(new Uint8Array(5)))
+        .map(b => b.toString(16).padStart(2, '0')).join('');
     }
 
-    /* ─── Firebase (REST + SSE) ─────────────── */
-    function firebaseUrl(path) {
-      return `${FIREBASE_URL}/${path}.json`;
+    function getFid() {
+      return new URLSearchParams(window.location.search).get('fid');
     }
 
-    async function loadFromFirebase() {
-      setSyncState('saving', 'Loading...');
+    /* ─── Firebase ──────────────────────── */
+    function fbUrl(path) {
+      return `${FIREBASE_URL}/families/${familyId}/${path}.json`;
+    }
+
+    async function loadFamilyMeta() {
+      const res  = await fetch(`${FIREBASE_URL}/families/${familyId}.json`);
+      const data = await res.json();
+      if (!data) return false;
+      familyName = data.name  || 'Family';
+      members    = data.members || ['Person 1', 'Person 2'];
+      log        = data.log   || {};
+      return true;
+    }
+
+    async function createFamily(name, m0, m1) {
+      const fid = generateFid();
+      await fetch(`${FIREBASE_URL}/families/${fid}.json`, {
+        method: 'PUT',
+        body: JSON.stringify({ name, members: [m0, m1], log: {} }),
+        headers: { 'Content-Type': 'application/json' },
+      });
+      window.location.href = `?fid=${fid}`;
+    }
+
+    async function saveMeals(date, person, meals) {
+      setSyncState('saving', 'Saving...');
       try {
-        const res = await fetch(firebaseUrl('log'));
-        log = (await res.json()) || {};
-        setSyncState('synced', 'Live — data shared across devices');
-      } catch (e) {
-        setSyncState('error', 'Could not reach database');
+        const path = `log/${date}/${person}`;
+        if (meals.length === 0) {
+          await fetch(fbUrl(path), { method: 'DELETE' });
+        } else {
+          await fetch(fbUrl(path), {
+            method: 'PUT',
+            body: JSON.stringify(meals),
+            headers: { 'Content-Type': 'application/json' },
+          });
+        }
+      } catch {
+        setSyncState('error', 'Failed to save');
       }
     }
 
     function listenForUpdates() {
       if (sse) sse.close();
-      sse = new EventSource(firebaseUrl('log') + '?stream=1');
+      sse = new EventSource(fbUrl('log') + '?stream=1');
       sse.addEventListener('put', e => {
         const { path, data } = JSON.parse(e.data);
         if (path === '/') {
           log = data || {};
         } else {
-          // Partial path update
           const parts = path.slice(1).split('/');
           let node = log;
           for (let i = 0; i < parts.length - 1; i++) {
             if (!node[parts[i]]) node[parts[i]] = {};
             node = node[parts[i]];
           }
-          if (data === null) delete node[parts[parts.length - 1]];
-          else node[parts[parts.length - 1]] = data;
+          if (data === null) delete node[parts.at(-1)];
+          else node[parts.at(-1)] = data;
         }
         setSyncState('synced', 'Live — data shared across devices');
         render();
       });
-      sse.addEventListener('patch', e => {
-        // Reload fully on patch to keep things simple
-        loadFromFirebase().then(render);
-      });
-      sse.onerror = () => {
-        setSyncState('error', 'Connection lost — retrying...');
-      };
+      sse.onerror = () => setSyncState('error', 'Connection lost — retrying...');
     }
 
-    // Write only the changed person's meals for a specific date
-    async function saveMealsToFirebase(date, person, meals) {
-      setSyncState('saving', 'Saving...');
-      try {
-        const path = `log/${date}/${person}`;
-        if (meals.length === 0) {
-          await fetch(firebaseUrl(path), { method: 'DELETE' });
-        } else {
-          await fetch(firebaseUrl(path), {
-            method: 'PUT',
-            body: JSON.stringify(meals),
-            headers: { 'Content-Type': 'application/json' },
-          });
-        }
-        // SSE will update local state; no need to re-render here
-      } catch (e) {
-        setSyncState('error', 'Failed to save');
-      }
+    /* ─── Sync dot ──────────────────────── */
+    function setSyncState(state, tip) {
+      const dot = document.getElementById('sync-dot');
+      if (dot) { dot.className = 'sync-dot ' + state; dot.title = tip; }
     }
 
-    /* ─── localStorage fallback ─────────────── */
-    function loadFromLocal() {
-      try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || {}; }
-      catch { return {}; }
-    }
-
-    function saveToLocal(date, person, meals) {
-      if (!log[date]) log[date] = {};
-      if (meals.length === 0) {
-        delete log[date][person];
-        if (Object.keys(log[date]).length === 0) delete log[date];
-      } else {
-        log[date][person] = meals;
-      }
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(log));
-      render();
-    }
-
-    /* ─── Visual effects ────────────────────── */
+    /* ─── Effects ───────────────────────── */
     function spawnFloatLabel(btn, text, adding) {
       const rect = btn.getBoundingClientRect();
       const el = document.createElement('div');
@@ -510,80 +635,86 @@
     }
 
     function popScore(person) {
-      const id = person === 'Oliver' ? 'oliver-score' : 'claire-score';
-      const el = document.getElementById(id);
+      const idx = members.indexOf(person);
+      const el = document.getElementById('score-' + idx);
+      if (!el) return;
       el.classList.remove('score-pop');
-      void el.offsetWidth; // reflow to restart animation
+      void el.offsetWidth;
       el.classList.add('score-pop');
       el.addEventListener('animationend', () => el.classList.remove('score-pop'), { once: true });
     }
 
     function flashPlate(person) {
-      const id = person === 'Oliver' ? 'plate-oliver' : 'plate-claire';
-      const el = document.getElementById(id);
+      const idx = members.indexOf(person);
+      const el = document.getElementById('plate-' + idx);
+      if (!el) return;
       el.classList.remove('plate-flash');
       void el.offsetWidth;
       el.classList.add('plate-flash');
       el.addEventListener('animationend', () => el.classList.remove('plate-flash'), { once: true });
     }
 
-    /* ─── Toggle ────────────────────────────── */
-    function toggleMeal(person, mealName, btnEl) {
-      const meals = getMeals(person);
+    /* ─── Toggle ────────────────────────── */
+    function toggleMeal(person, mealName, btn) {
+      const meals  = getMeals(person);
       const adding = !meals.includes(mealName);
       const updated = adding
         ? [...meals, mealName]
         : meals.filter(m => m !== mealName);
 
-      const weight = mealWeight(mealName);
-      const label = (adding ? '+' : '-') + weight + 'kg';
-
-      // Find the button that was clicked for positioning the float label
-      const btn = btnEl || event?.target?.closest('.meal-btn');
-      if (btn) spawnFloatLabel(btn, label, adding);
+      if (btn) spawnFloatLabel(btn, (adding ? '+' : '-') + mealWeight(mealName) + 'kg', adding);
       popScore(person);
       flashPlate(person);
 
-      if (FIREBASE_URL) {
-        // Optimistic update for snappy UI
-        if (!log[selectedDate]) log[selectedDate] = {};
-        if (updated.length === 0) delete log[selectedDate][person];
-        else log[selectedDate][person] = updated;
-        if (Object.keys(log[selectedDate]).length === 0) delete log[selectedDate];
-        render();
-        saveMealsToFirebase(selectedDate, person, updated);
-      } else {
-        saveToLocal(selectedDate, person, updated);
-      }
+      // Optimistic update
+      if (!log[selectedDate]) log[selectedDate] = {};
+      if (updated.length === 0) delete log[selectedDate][person];
+      else log[selectedDate][person] = updated;
+      if (Object.keys(log[selectedDate]).length === 0) delete log[selectedDate];
+
+      render();
+      saveMeals(selectedDate, person, updated);
     }
 
-    /* ─── Weight discs ──────────────────────── */
-    // Track previous per-person meals to detect newly added ones
-    const prevDiscs = { Oliver: [], Claire: [] };
+    /* ─── Render ────────────────────────── */
+    function renderScale() {
+      const balance = getBalance();
+      const angle   = Math.max(-24, Math.min(24, balance * 3.5));
+      const beam    = document.getElementById('scale-beam');
+      beam.style.transformOrigin = '150px 46px';
+      beam.style.transform       = `rotate(${angle}deg)`;
 
-    // Disc visual config per meal (heaviest at bottom)
-    const DISC_STYLE = {
-      Dinner: { fill: '#6366f1', stroke: '#4338ca', w: 44, label: '2kg' },
-      Lunch:  { fill: '#a78bfa', stroke: '#7c3aed', w: 36, label: '1.5kg' },
-    };
+      const fmt = v => (v > 0 ? '+' : '') + v.toFixed(1) + 'kg';
+
+      [0, 1].forEach(i => {
+        const sign = i === 0 ? balance : -balance;
+        const el = document.getElementById('score-' + i);
+        el.textContent = fmt(sign);
+        el.className   = 'scale-score ' + (sign > 0.01 ? 'ahead' : sign < -0.01 ? 'behind' : 'even');
+      });
+
+      const note = document.getElementById('balance-note');
+      if (Math.abs(balance) < 0.01) {
+        note.textContent = 'All even!';
+      } else {
+        const leader = balance > 0 ? members[0] : members[1];
+        note.textContent = `${leader} is ahead by ${Math.abs(balance).toFixed(1)}kg`;
+      }
+
+      renderWeightDiscs();
+    }
 
     function renderWeightDiscs() {
-      const PLATE = { Oliver: 58, Claire: 242 };
-
-      ['Oliver', 'Claire'].forEach(person => {
-        const meals = getMeals(person);
-        // Heaviest at bottom (index 0 = bottommost disc)
+      const DISC_H = 14, GAP = 2, BASE_Y = 62;
+      members.forEach((person, idx) => {
+        const meals  = getMeals(person);
         const sorted = [...meals].sort((a, b) => mealWeight(b) - mealWeight(a));
-
-        const px = PLATE[person];
-        // Bottom of plate ellipse is at cy=68, top at ~63
-        // Stack discs upward: disc 0 bottom at y=62, disc 1 above that, etc.
-        const DISC_H = 14, GAP = 2, BASE_Y = 62;
-
+        if (!prevDiscs[person]) prevDiscs[person] = [];
+        const px  = PLATE_X[idx];
         const svg = sorted.map((meal, i) => {
-          const s = DISC_STYLE[meal] || DISC_STYLE.Dinner;
-          const isNew = !prevDiscs[person].includes(meal);
+          const s   = DISC_STYLE[meal] || DISC_STYLE.Dinner;
           const top = BASE_Y - (i + 1) * (DISC_H + GAP);
+          const isNew = !prevDiscs[person].includes(meal);
           return `<g class="${isNew ? 'w-disc-new' : ''}">
             <rect x="${px - s.w / 2}" y="${top}" width="${s.w}" height="${DISC_H}"
               rx="7" fill="${s.fill}" stroke="${s.stroke}" stroke-width="1"/>
@@ -592,56 +723,26 @@
               fill="white">${s.label}</text>
           </g>`;
         }).join('');
-
-        document.getElementById('weights-' + person.toLowerCase()).innerHTML = svg;
+        document.getElementById('weights-' + idx).innerHTML = svg;
         prevDiscs[person] = [...meals];
       });
     }
 
-    /* ─── Render ────────────────────────────── */
-    function renderScale() {
-      const balance = getBalance();
-      const angle = Math.max(-24, Math.min(24, balance * 3.5));
-      const beam = document.getElementById('scale-beam');
-      beam.style.transformOrigin = '150px 46px';
-      beam.style.transform = `rotate(${angle}deg)`;
-
-      const fmt = v => (v > 0 ? '+' : '') + v.toFixed(1) + 'kg';
-      const oEl = document.getElementById('oliver-score');
-      const cEl = document.getElementById('claire-score');
-
-      oEl.textContent = fmt(balance);
-      cEl.textContent = fmt(-balance);
-      oEl.className = 'scale-score ' + (balance > 0.01 ? 'ahead' : balance < -0.01 ? 'behind' : 'even');
-      cEl.className = 'scale-score ' + (-balance > 0.01 ? 'ahead' : -balance < -0.01 ? 'behind' : 'even');
-
-      const note = document.getElementById('balance-note');
-      if (Math.abs(balance) < 0.01) {
-        note.textContent = 'All even!';
-      } else {
-        const leader = balance > 0 ? 'Oliver' : 'Claire';
-        note.textContent = `${leader} is ahead by ${Math.abs(balance).toFixed(1)}kg`;
-      }
-
-      renderWeightDiscs();
-    }
-
     function renderPeople() {
-      document.getElementById('people-row').innerHTML =
-        ['Oliver', 'Claire'].map(person => {
-          const personMeals = getMeals(person);
-          const btns = MEALS.map(meal => {
-            const done = personMeals.includes(meal.name);
-            return `<button class="meal-btn${done ? ' done' : ''}"
-              onclick="toggleMeal('${person}','${meal.name}',this)">
-              <span>${done ? meal.name + ' ✓' : meal.name}</span>
-              <span class="meal-tag">${meal.weight}kg</span>
-            </button>`;
-          }).join('');
-          return `<div class="person-card">
-            <div class="person-card-name">${person}</div>${btns}
-          </div>`;
+      document.getElementById('people-row').innerHTML = members.map(person => {
+        const personMeals = getMeals(person);
+        const btns = MEALS.map(meal => {
+          const done = personMeals.includes(meal.name);
+          return `<button class="meal-btn${done ? ' done' : ''}"
+            onclick="toggleMeal('${person}','${meal.name}',this)">
+            <span>${done ? meal.name + ' ✓' : meal.name}</span>
+            <span class="meal-tag">${meal.weight}kg</span>
+          </button>`;
         }).join('');
+        return `<div class="person-card">
+          <div class="person-card-name">${person}</div>${btns}
+        </div>`;
+      }).join('');
     }
 
     function renderHistory() {
@@ -655,10 +756,9 @@
         el.innerHTML = '<div class="empty-history">No entries yet</div>';
         return;
       }
-
       el.innerHTML = dates.map(date => {
-        const day = log[date];
-        const chips = ['Oliver', 'Claire'].map(p => {
+        const day   = log[date];
+        const chips = members.map(p => {
           const meals = day[p] || [];
           if (!meals.length) return '';
           const kg = meals.reduce((s, m) => s + mealWeight(m), 0);
@@ -677,26 +777,76 @@
       renderHistory();
     }
 
-    /* ─── Init ──────────────────────────────── */
+    /* ─── Init ──────────────────────────── */
     async function init() {
-      const dateInput = document.getElementById('date-input');
-      dateInput.value = selectedDate;
-      dateInput.max = getToday();
-      dateInput.addEventListener('change', e => {
-        selectedDate = e.target.value;
-        render();
-      });
+      familyId = getFid();
 
-      if (FIREBASE_URL) {
-        document.getElementById('subtitle').textContent = 'Live — shared across devices';
-        await loadFromFirebase();
-        listenForUpdates();
-      } else {
-        log = loadFromLocal();
-        setSyncState('local', 'Local only — data not shared between devices');
-        document.getElementById('subtitle').textContent = 'Local only — set up database to share';
+      /* ── No family in URL: show setup ── */
+      if (!familyId) {
+        document.getElementById('screen-setup').style.display = 'flex';
+
+        document.getElementById('setup-btn').addEventListener('click', async () => {
+          const name = document.getElementById('setup-family-name').value.trim();
+          const m0   = document.getElementById('setup-member-0').value.trim();
+          const m1   = document.getElementById('setup-member-1').value.trim();
+          const err  = document.getElementById('setup-error');
+
+          if (!name || !m0 || !m1) {
+            err.textContent = 'Please fill in all three fields.'; return;
+          }
+          if (m0.toLowerCase() === m1.toLowerCase()) {
+            err.textContent = 'Members must have different names.'; return;
+          }
+          err.textContent = '';
+          const btn = document.getElementById('setup-btn');
+          btn.disabled = true; btn.textContent = 'Creating…';
+
+          try {
+            await createFamily(name, m0, m1);
+          } catch {
+            err.textContent = 'Could not reach the database. Check your connection.';
+            btn.disabled = false; btn.textContent = 'Create Family';
+          }
+        });
+        return;
       }
 
+      /* ── Family ID in URL: show app ── */
+      document.getElementById('screen-app').style.display = 'flex';
+      setSyncState('saving', 'Loading…');
+
+      let found;
+      try { found = await loadFamilyMeta(); }
+      catch { found = false; }
+
+      if (!found) {
+        document.getElementById('fid-error').style.display = 'block';
+        setSyncState('error', 'Family not found');
+        return;
+      }
+
+      // Patch names into scale labels and title
+      document.getElementById('app-title').textContent = familyName;
+      document.getElementById('scale-name-0').textContent = members[0].toUpperCase();
+      document.getElementById('scale-name-1').textContent = members[1].toUpperCase();
+
+      // Share button
+      document.getElementById('share-btn').addEventListener('click', () => {
+        navigator.clipboard.writeText(window.location.href).then(() => {
+          const btn = document.getElementById('share-btn');
+          btn.textContent = 'Copied!';
+          btn.classList.add('copied');
+          setTimeout(() => { btn.textContent = 'Share'; btn.classList.remove('copied'); }, 1800);
+        });
+      });
+
+      // Date picker
+      const di = document.getElementById('date-input');
+      di.value = selectedDate; di.max = getToday();
+      di.addEventListener('change', e => { selectedDate = e.target.value; render(); });
+
+      setSyncState('synced', 'Live — data shared across devices');
+      listenForUpdates();
       render();
     }
 
