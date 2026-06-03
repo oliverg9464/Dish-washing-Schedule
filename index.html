@@ -257,6 +257,14 @@
 
     /* ── ANIMATIONS ────────────────────────────── */
 
+    /* Weight disc drop-in */
+    @keyframes disc-drop {
+      0%   { opacity: 0; transform: translateY(-14px) scaleY(0.5); }
+      60%  { opacity: 1; transform: translateY(3px)   scaleY(1.05); }
+      100% { opacity: 1; transform: translateY(0)     scaleY(1); }
+    }
+    .w-disc-new { animation: disc-drop 0.32s cubic-bezier(0.34, 1.4, 0.64, 1); }
+
     /* Score bounce when value changes */
     @keyframes score-pop {
       0%   { transform: scale(1); }
@@ -313,9 +321,13 @@
           <line x1="58" y1="46" x2="58" y2="68" stroke="#94a3b8" stroke-width="2"/>
           <ellipse id="plate-oliver" cx="58" cy="68" rx="26" ry="5"
             fill="#e2e8f0" stroke="#cbd5e0" stroke-width="1.5"/>
+          <!-- weight discs stacked above Oliver's plate -->
+          <g id="weights-oliver"></g>
           <line x1="242" y1="46" x2="242" y2="68" stroke="#94a3b8" stroke-width="2"/>
           <ellipse id="plate-claire" cx="242" cy="68" rx="26" ry="5"
             fill="#e2e8f0" stroke="#cbd5e0" stroke-width="1.5"/>
+          <!-- weight discs stacked above Claire's plate -->
+          <g id="weights-claire"></g>
         </g>
       </svg>
       <div class="scale-labels">
@@ -545,6 +557,47 @@
       }
     }
 
+    /* ─── Weight discs ──────────────────────── */
+    // Track previous per-person meals to detect newly added ones
+    const prevDiscs = { Oliver: [], Claire: [] };
+
+    // Disc visual config per meal (heaviest at bottom)
+    const DISC_STYLE = {
+      Dinner: { fill: '#6366f1', stroke: '#4338ca', w: 44, label: '2kg' },
+      Lunch:  { fill: '#a78bfa', stroke: '#7c3aed', w: 36, label: '1.5kg' },
+    };
+
+    function renderWeightDiscs() {
+      const PLATE = { Oliver: 58, Claire: 242 };
+
+      ['Oliver', 'Claire'].forEach(person => {
+        const meals = getMeals(person);
+        // Heaviest at bottom (index 0 = bottommost disc)
+        const sorted = [...meals].sort((a, b) => mealWeight(b) - mealWeight(a));
+
+        const px = PLATE[person];
+        // Bottom of plate ellipse is at cy=68, top at ~63
+        // Stack discs upward: disc 0 bottom at y=62, disc 1 above that, etc.
+        const DISC_H = 14, GAP = 2, BASE_Y = 62;
+
+        const svg = sorted.map((meal, i) => {
+          const s = DISC_STYLE[meal] || DISC_STYLE.Dinner;
+          const isNew = !prevDiscs[person].includes(meal);
+          const top = BASE_Y - (i + 1) * (DISC_H + GAP);
+          return `<g class="${isNew ? 'w-disc-new' : ''}">
+            <rect x="${px - s.w / 2}" y="${top}" width="${s.w}" height="${DISC_H}"
+              rx="7" fill="${s.fill}" stroke="${s.stroke}" stroke-width="1"/>
+            <text x="${px}" y="${top + 9.5}" text-anchor="middle"
+              font-size="8.5" font-weight="700" font-family="system-ui,sans-serif"
+              fill="white">${s.label}</text>
+          </g>`;
+        }).join('');
+
+        document.getElementById('weights-' + person.toLowerCase()).innerHTML = svg;
+        prevDiscs[person] = [...meals];
+      });
+    }
+
     /* ─── Render ────────────────────────────── */
     function renderScale() {
       const balance = getBalance();
@@ -569,6 +622,8 @@
         const leader = balance > 0 ? 'Oliver' : 'Claire';
         note.textContent = `${leader} is ahead by ${Math.abs(balance).toFixed(1)}kg`;
       }
+
+      renderWeightDiscs();
     }
 
     function renderPeople() {
